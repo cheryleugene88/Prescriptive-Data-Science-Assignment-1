@@ -1,0 +1,43 @@
+Lagi merangkum riset faktor terbaru. Kode MVO sebelumnya juga sudah saya tes ulang dan jalan sampai akhir, tapi baru di data sintetis, belum di datamu. Belum ada yang saya eksekusi untuk fitur baru ini.
+
+Saya paham maksudmu: berita dan kondisi dunia nyata diubah jadi aturan yang bisa dihitung, lalu dipakai untuk menggeser pilihan dan bobot saham di optimasi. Satu hal penting sebelum ke daftarnya. Kalau datamu berhenti 31 Agustus, ia belum memuat guncangan terbesar tahun ini.
+
+- Pada 16 Oktober 2026 IHSG ditutup di 5.185,10, anjlok 11,57% dalam sehari, padahal pertengahan Januari sempat menembus 9.000.
+- Pemicunya MSCI memulai konsultasi untuk menurunkan status Indonesia dari emerging market ke standalone market, dan IHSG sempat kena trading halt.
+- Konsultasi berlangsung sampai 30 April 2027, dengan keputusan final paling lambat 30 Juni 2027. Jadi ketidakpastiannya masih panjang.
+
+## Faktor dan logikanya
+
+| Faktor | Kondisi terkini | Logika ke saham |
+|---|---|---|
+| **Risiko MSCI / free float** | BEI mengecualikan emiten HSC (kepemilikan sangat terkonsentrasi) dari perhitungan IHSG, berlaku 2 November. Total HSC kini 82 saham. | Saham HSC rawan arus keluar asing dan likuiditas tipis. Beri penalti return dan batas bobot kecil. BREN, DSSA, dan DNET muncul di daftar HSC yang saya temukan. Cek daftar terbaru untuk 50 tickermu. |
+| **Arus asing vs dukungan domestik** | Asing masih jual bersih Rp6,67 T pada pekan 19-23 Oktober. Danantara mulai membeli saham BUMN, dan BBCA jadi saham dengan jual bersih asing terbesar sejak awal tahun. | Saham yang dijual asing tertekan. Saham BUMN (BBRI, BMRI, BBNI, TLKM) dapat penopang. Pakai ini sebagai penyesuaian skor jangka pendek, bukan sinyal jangka panjang. |
+| **Suku bunga & rupiah** | BI menaikkan BI Rate 100 bps ke 5,75% pada Juni dan menahannya sejak itu. Rupiah 17.985 per dolar AS pada 20 Oktober. BI juga menurunkan GWM bank mulai November. | Bunga tinggi menekan saham yang utangnya besar atau valuasinya mahal. Rupiah lemah menguntungkan eksportir berpendapatan dolar dan merugikan importir atau yang berutang dolar. Bank: margin dan likuiditas vs tekanan asing. |
+| **Fed & dolar** | Ketua Fed Kevin Warsh mengisyaratkan kemungkinan kenaikan bunga tahun ini. | Fed hawkish menguatkan dolar dan menekan aset emerging market. Efeknya lewat rupiah dan arus asing. |
+| **Batu bara** | Newcastle sekitar US$150,7 per ton, ditopang permintaan China dan India serta pasokan terbatas. Target produksi RKAB 2026 dipangkas sekitar 24% ke 600 juta ton. Windfall tax dan bea keluar ditunda untuk 2026, tapi risikonya masih terbuka untuk 2027. | Positif untuk ADRO, AADI, BYAN, PTRO, ADMR, BUMI, UNTR. Tapi volumenya dibatasi kuota dan ada risiko pajak 2027, jadi jangan terlalu optimis. |
+| **Nikel & emas** | Kuota nikel diperkirakan 260-270 juta ton, turun dari 379 juta ton. Nikel LME sekitar US$16.600 per ton pada akhir September. Emas global sekitar US$4.150. | Nikel: ANTM, INCO, MBMA, NCKL, MDKA. Emas: ANTM, AMMN, BRMS, EMAS. Kuota yang ketat menopang harga, tapi ANTM sempat jatuh ke 2.550 saat 16 Oktober. |
+| **Energi & geopolitik** | Brent sekitar US$89 pada akhir Agustus. Negosiasi AS-Iran soal Selat Hormuz masih belum tuntas pada akhir September. | Minyak tinggi menaikkan inflasi dan beban subsidi, sehingga menekan konsumer dan rupiah. Menguntungkan batu bara. |
+| **Inflasi & konsumsi** | Inflasi September 3,28%. Indeks keyakinan konsumen sempat turun tiga bulan beruntun hingga Juli. | Menekan UNVR, ICBP, INDF, HMSP, AMRT, CPIN. |
+
+Dua catatan akurasi. Kabar Hormuz saling bertentangan antar sumber (ada kesepakatan damai Juni, lalu sengketa lagi September). Level suku bunga Fed juga saya dapat dari satu sumber yang kurang kuat. Keduanya perlu dicek ulang sebelum dipakai.
+
+## Cara mengubahnya jadi logika
+
+1. **Filter keras.** Buang saham yang `review_flag` di data quality, yang HSC, dan yang likuiditasnya tipis.
+2. **Skor faktor.** Tiap faktor dikasih arah (-2 sampai +2) untuk tiap sektor, dikali sensitivitas saham. Sensitivitas diukur dari datamu sendiri, misalnya regresi return saham ke perubahan USD/IDR atau harga batu bara.
+3. **Jadikan views, bukan prediksi.** Notebook-mu sudah menunjukkan return harian hampir tidak bisa diprediksi dan baseline nol menang. Jadi skor berita jangan langsung dipakai sebagai expected return. Pakai model Black-Litterman: return historis jadi prior, skor faktor jadi views dengan tingkat keyakinan. Hasilnya geseran kecil, bukan lompatan.
+4. **Kovarians sadar rezim.** Beri bobot lebih ke periode stres (krisis Oktober). Kalau tidak, risiko terlalu diremehkan.
+5. **Batas tambahan.** Maksimum per sektor, per grup konglomerat (Prajogo, Salim, dll), dan batas khusus untuk saham HSC.
+
+Satu pertanyaan sebelum saya mulai: untuk tahap pertama, mau saya buat versi **rule-based** (skor faktor manual seperti tabel di atas, transparan dan mudah dijelaskan di tugas) atau versi **data-driven** (regresi sensitivitas dulu baru Black-Litterman)? 
+
+DNET dan BYAN mentok di cap 10% di semua strategi. DNET ada di daftar HSC (kepemilikan terkonsentrasi tinggi) yang saya temukan di riset sebelumnya, dan akan keluar dari perhitungan IHSG mulai 2 November. Optimizer menyukainya karena volatilitas historisnya rendah, tapi itu bisa jadi efek likuiditas tipis, bukan risiko rendah. Saran saya: tambahkan filter HSC di tahap universe.
+
+Patokan output yang benar
+
+Lolos (ini yang harus selalu terpenuhi):
+
+Bobot berjumlah 1, tidak ada yang negatif, dan tidak ada yang melewati 10%. Semua terpenuhi.
+Solver sukses. Kalau success=False, kode berhenti dengan error.
+Vol Min Variance (10,6%) lebih kecil dari Equal Weight (14,6%) dan dari saham termurah. Terpenuhi.
+Return Max Sharpe ≥ Min Variance, dan jumlah saham yang dipegang minimal 10 (di sini 20–23, effective N sekitar 15). Terpenuhi.
