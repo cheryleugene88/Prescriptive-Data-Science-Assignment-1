@@ -1,0 +1,23 @@
+status,check,detail
+PASS,Tidak ada saham HSC/quality-flag di universe,
+PASS,Tidak ada NaN pada data estimasi,
+PASS,Kovarians Fase B positif-definit,"eig min=2.74e-02, cond=7.7e+01"
+PASS,Kondisi kovarians < 1e5,cond=7.7e+01
+PASS,Constraint Equal Weight,
+PASS,Constraint Risk Parity (ERC),
+PASS,Constraint Blend EW + ERC (utama),
+PASS,Constraint Blend EW + Min Variance,
+PASS,Constraint Min Variance,
+PASS,Constraint Max Sharpe (prior BL),
+PASS,Constraint Max Sharpe (BL + view),
+PASS,Walk-forward hanya memakai data sampai tanggal keputusan,33 tanggal
+PASS,Biaya transaksi diterapkan di simulasi,
+PASS,Walk-forward: portofolio utama memakai 33 bulan penuh,33 tanggal
+PASS,Fase B: vol Blend <= vol Equal Weight (model),
+PASS,Fase B: vol ERC <= vol Equal Weight (model),
+PASS,Fase B: rasio kontribusi risiko ERC (maks/min) < 3,1.00
+PASS,Fase B: Effective N portofolio utama >= 15,27.2
+PASS,Eksperimen tilt: bobot memenuhi batas saham dan sektor,
+PASS,Faktor makro nyata tersedia (komparator BL),yfinance
+WARN,Data harga cukup baru (< 30 hari dari FINAL_END),data terakhir 2026-08-31
+PASS,Tidak ada saham dgn >30% return nol di universe,maks 19.4%
